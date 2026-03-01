@@ -22,7 +22,7 @@ O projeto foi construído num pipeline completo de Análise Exploratória de Dad
 
 ## 📈 Principais Insights e Resultados
 
-* **A Hipótese foi Confirmada:** O P-valor tendendo a zero no teste de Pearson nos permitiu rejeitar a Hipótese Nula. Existe uma forte relação **negativa** entre a relação A/C e a resistência, validando a Lei de Abrams.
+* **A Hipótese foi Confirmada:** O P-valor tendendo a zero no teste de Pearson nos permitiu rejeitar a Hipótese Nula. Existe uma relação **negativa** entre a relação A/C e a resistência, validando a Lei de Abrams.
 * **O Limite da Relação A/C:** Através do R-Quadrado ($R^2$), descobrimos que a relação Água/Cimento explica **apenas cerca de 24%** da variação total da resistência do concreto neste dataset. 
 * **Conclusão Prática:** Isso prova estatisticamente que controlar apenas a água e o cimento não garante a resistência estrutural. Os outros 75% dependem obrigatoriamente de outras *features* (como tempo de cura, uso de superplastificantes e tipos de agregados), abrindo espaço para futuras modelagens de **Machine Learning**.
 
