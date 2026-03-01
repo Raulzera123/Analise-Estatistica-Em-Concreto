@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from fitter import Fitter
-from scipy.stats import shapiro, probplot, pearsonr, linregress
+from scipy.stats import shapiro, probplot, spearmanr, linregress
 
 # Fazendo a Leitura do arquivo
 file_path = 'Concreto/concrete.csv'
@@ -48,7 +48,7 @@ stats, p_value = shapiro(concrete_clean['strength'])
 print(f'Estatística de Teste: {stats:.3f}')
 print(f'Cálculo do p-valor: {p_value:.10f}')
 if p_value < 0.05:
-    print('Rejeitamos a hipótese de que a distribuição é uma distribuição normal')
+    print('Rejeitamos a hipótese de que a distribuição da resistência não tem relação com a curva normal')
 else:
     print('Falha ao rejeitar a hipótese nula. O gráfico parece seguir uma distribuição normal')  
 print('=' * 70)
@@ -64,7 +64,7 @@ print('=' * 70)
 print('Podemos perceber que a distribuição pelo método QQ-Plot não satisfaz para uma distribuição normal')
 print(f'Apesar de R² estar bem ajustado {r_squared[2]:.3f} podemos perceber pelo gráfico que a curva não segue uma normal')
 
-print('=' * 70)
+"""print('=' * 70)
 print(' UTILIZANDO O FITTER PARA VERIFICAÇÃO ')
 func_distr = Fitter(concrete_clean.strength)
 func_distr.fit()
@@ -72,7 +72,7 @@ print(func_distr.summary())
 plt.show()
 print("A melhor distribuição matemática para estes dados é:")
 print(func_distr.get_best(method='sumsquare_error'))
-print('=' * 70)
+print('=' * 70)"""
 
 print('=' * 70)
 print(' PLOTANDO GRÁFICOS PARA A RELAÇÃO ÁGUA/CIMENTO ')
@@ -101,26 +101,12 @@ axes[1].set_xlabel('Relação a/c')
 # hspace = espaço horizontal (altura) entre as linhas
 # wspace = espaço vertical (largura) entre as colunas
 plt.subplots_adjust(hspace=0.4, wspace=0.3)
+plt.tight_layout()
+plt.show()
 
 """ Criamos aqui a seguinte hipótese: Não existe relação nenhuma entre a quantidade de água/cimento e a força do concreto
     Ou seja, queremos verificar se a correlação é igual ou muito proxima de zero 
     Assim temos a hipótese alternativa: O coeficiente de correlação é diferente de 0 """
-
-print('=' * 70)
-print(' CALCULANDO PELO MÉTODO DE PEARSON ')
-print('=' * 70)
-print('Iniciando o teste estatístico (Pearson)...')
-r, p_valor = pearsonr(concrete_clean['Relação água/cimento'], concrete_clean.strength)
-print(f'Valor calculado do P-Valor: {p_valor:.10f}')
-print(f'Coeficiente de correlação de Pearson: {r:.3f}')
-if p_valor < 0.05:
-    print('Rejeitamos a Hipótese Nula (H0)')
-    if r < 0:
-        print('Aceitamos a Hipótese Alternativa (H1)')
-        print('Logo temos uma relação entre o coeficiente a/c e a resistência do concreto')
-else:
-    print('Falha em rejeitar a hipótese nula!')
-print('=' * 70)
 
 print('=' * 70)
 print(' CALCULANDO PELO MÉTODO R-QUADRADO ')
@@ -145,6 +131,57 @@ plt.title(f'Lei de Abrams: Relação A/C vs Resistência')
 plt.xlabel('Relação Água / Cimento (A/C)')
 plt.ylabel('Resistência à Compressão (MPa)')
 print('=' * 70)
+
+# Relação entre as idades do concreto antes do ensaio de compressão
+fig, ax = plt.subplots(nrows=2, ncols=1, figsize=(7,7))
+sns.histplot(data=concrete_clean, x='age', kde=True, color='blue', ax=ax[0])
+ax[0].set_title('Distribuição das idades')
+ax[0].set_xlabel('Idade do Concreto')
+sns.scatterplot(data=concrete_clean, x='age', y='strength', color='red', ax=ax[1])
+ax[1].set_title('Idade x Resistência à compressão')
+ax[1].set_xlabel('Idade')
+ax[1].set_ylabel('Resistência à Compressão (MPa)')
+
+" Aqui realizaremos a análise de Spearman "
+print('=' * 70)
+print(' CALCULANDO PELO MÉTODO DE SPEARMAN ')
+print('=' * 70)
+r_spearman, p_spearman = spearmanr(concrete_clean.age, concrete_clean.strength)
+print(f'Valor calculado para o P-Valor: {p_spearman}')
+print(f'Coeficiente de correlação de Spearman: {r_spearman}')
+
+if p_spearman < 0.05:
+    print('Rejeitamos a hipótese nula (H0)')
+    if (r_spearman < -0.5) or (r_spearman > 0.5):
+        print('Aceitamos a hipótese alternativa (H1)')
+else: 
+    print('Falhamos em rejeitar a hipótese nula (HO)')
+
+" Aqui realizaremos a análise do R-QUADRADO "
+print('=' * 70)
+print(' CALCULANDO PELO MÉTODO DE R-QUADRADO ')
+print('=' * 70)
+slope, intercept, r, p_value, std_slope = linregress(concrete_clean.age, concrete_clean.strength)
+print(f'Taxa de variação: {slope:.3f}')
+print(f'Coeficiente R²: {r**2}')
+print(f'P-Valor calculado: {p_value}')
+if p_value < 0.05:
+    print('Rejeitamos a hipótese de que não há relação entre a Idade do concreto e resistência dele')
+    if (slope > 0):
+        print('Aceitamos a hipótese de que a taxa de variação é positiva')
+else:
+    print('Falhamos em rejeitar a hipótese nula')
+
+print('Gerando o grafico da relação...')
+plt.figure(figsize=(7,7))
+sns.regplot(data=concrete_clean, x='age', 
+            y='strength', 
+            line_kws={'color':'blue', 'linewidth':3}, 
+            scatter_kws={'alpha':0.4, 'color':'blue'}
+            )
+plt.title('Relação entre Idade e Resistência')
+plt.xlabel('Idade (D)')
+plt.ylabel('Resistência (MPa)')
 
 plt.tight_layout()
 plt.show()
