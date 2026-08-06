@@ -104,7 +104,7 @@ plt.subplots_adjust(hspace=0.4, wspace=0.3)
 plt.tight_layout()
 plt.show()
 
-""" Criamos aqui a seguinte hipótese: Não existe relação nenhuma entre a quantidade de água/cimento e a força do concreto
+""" Criamos aqui a seguinte hipótese: Não existe relação nenhuma entre o fator água/cimento e a resistência do concreto
     Ou seja, queremos verificar se a correlação é igual ou muito proxima de zero 
     Assim temos a hipótese alternativa: O coeficiente de correlação é diferente de 0 """
 
